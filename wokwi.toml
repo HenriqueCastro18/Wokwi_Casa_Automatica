@@ -1,0 +1,7 @@
+[wokwi]
+version = 1
+firmware = "firmware/firmware.bin"
+
+[[net.forward]]
+from = "localhost:8180"
+to = "target:80"

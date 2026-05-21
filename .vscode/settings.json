@@ -1,0 +1,6 @@
+{
+  "wokwi.port": 3000,
+  "[wokwi]": {
+    "editor.defaultFormatter": "wokwi.wokwi-vscode"
+  }
+}
