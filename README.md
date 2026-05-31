@@ -1,224 +1,224 @@
-# Sistema de Automação e Monitoramento Residencial IoT
+# 🏠 Casa Automática IoT — ESP32 + MicroPython
 
-Uma solução completa de automação residencial baseada em ESP32 e MicroPython, oferecendo monitoramento em tempo real, controle de dispositivos e integração com múltiplos protocolos de comunicação.
+> Uma maquete de casa inteligente que monitora o ambiente, decide sozinha quando ligar o ar-condicionado, dispara alarmes e ainda entrega um painel web bonito em tempo real — tudo rodando num ESP32 simulado no Wokwi.
 
-## 📋 Visão Geral
+Este projeto nasceu como um sistema de automação residencial: um punhado de sensores conectados a um ESP32 que lê o ambiente, toma decisões automáticas (um termostato com lógica própria), avisa de situações de risco e publica tudo em três frentes ao mesmo tempo — um **display OLED** local, um **dashboard web** servido pelo próprio ESP32, e a nuvem via **MQTT** (que alimenta um fluxo no **Node-RED** e até uma planilha do Google).
 
-Sistema IoT modular que implementa:
-- **Monitoramento ambiental**: temperatura, umidade, luminosidade, detecção de gás e movimento
-- **Controle de acesso**: autenticação via teclado matricial com bloqueio de segurança
-- **Automação inteligente**: controle de ar-condicionado baseado em temperatura e detecção de gás
-- **Interface local**: display OLED para feedback imediato do sistema
-- **Interface remota**: dashboard web em tempo real via HTTP e WebSocket
-- **Conectividade**: WiFi, MQTT (HiveMQ) e HTTP local para integração de terceiros
+---
 
-## 🚀 Funcionalidades Principais
+## 📑 Índice
 
-### Sensores e Leitura de Dados
-- **Temperatura e Umidade**: DHT22 com termostato inteligente
-- **Luminosidade**: Sensor LDR com faixa de 0-4095
-- **Detecção de Movimento**: Sensor PIR para alertas de presença
-- **Distância**: Sensor ultrassônico HC-SR04 (2-400 cm)
-- **Qualidade do Ar**: Sensor de gás MQ com limiar configurável
-- **Controle Manual**: Potenciômetro para ajuste dinâmico de limite de temperatura (20-40°C)
+- [O que ele faz](#-o-que-ele-faz)
+- [Como rodar no Wokwi](#-como-rodar-no-wokwi-passo-a-passo) ← *comece por aqui*
+- [O hardware (circuito)](#-o-hardware-circuito)
+- [A lógica por trás](#-a-lógica-por-trás)
+- [As três interfaces](#-as-três-interfaces)
+- [Comunicação: HTTP e MQTT](#-comunicação-http-e-mqtt)
+- [Os arquivos do projeto](#-os-arquivos-do-projeto)
 
-### Controle de Acesso
-- Teclado matricial 4x4 com suporte a senha numérica (padrão: 1234)
-- Sistema de bloqueio após 3 tentativas erradas (30 segundos)
-- Feedback sonoro em cada interação
-- Display local mostrando status da entrada em tempo real
+---
 
-### Automação de Climatização
-- Controle de ar-condicionado com histerese para evitar ligar/desligar frequente
-- Detecção e desativação automática do AC em caso de vazamento de gás
-- Limite de temperatura ajustável dinamicamente via potenciômetro
-- Estado persistente com feedback visual (LED RGB)
+## ✨ O que ele faz
 
-### Alertas e Monitoramento
-- **Alerta de Temperatura**: quando excede limite + 5°C
-- **Alerta de Luminosidade**: quando abaixo de 500 lux
-- **Alerta de Movimento**: detecção em modo armado
-- **Alerta de Proximidade**: objeto detectado a menos de 30 cm
-- **Alerta de Gás**: concentração acima de 3800 ppm
-- **Alerta de Invasão**: 3+ tentativas de entrada incorreta
+- **Lê o ambiente** — temperatura e umidade (DHT22), luminosidade (LDR), presença (PIR), distância (HC-SR04), gás (sensor MQ) e um potenciômetro para ajuste manual.
+- **Climatiza sozinho** — um termostato inteligente liga e desliga o ar-condicionado (relé) com base num limite de temperatura que *você* ajusta no potenciômetro, sem ficar piscando ligado/desligado.
+- **Vigia a casa** — dispara alertas de temperatura alta, pouca luz, movimento + objeto próximo e vazamento de gás.
+- **Avisa de três jeitos** — LED RGB colorido, buzzer e display OLED, todos refletindo o estado atual.
+- **Tem painel web próprio** — o ESP32 sobe um servidor HTTP e serve um dashboard que atualiza a cada 1 segundo, com botões para controlar os atuadores.
+- **Vai pra nuvem** — publica o estado via MQTT no broker público da HiveMQ, pronto pra ser consumido pelo Node-RED incluído (que ainda registra o histórico numa planilha Google).
 
-### Feedback Visual e Sonoro
-- **LED RGB**: indicação de estado (verde: normal, ciano: porta aberta, laranja: AC ligado, vermelho: alerta)
-- **NeoPixel Ring (16 LEDs)**: animação de alerta (pulsante em vermelho) ou padrão de espera
-- **Buzzer**: alertas sonoros com frequência variável conforme o tipo de evento
+---
 
-## 🔧 Hardware Necessário
+## 🚀 Como rodar no Wokwi (passo a passo)
 
-| Componente | Modelo | Pino ESP32 | Quantidade |
-|---|---|---|---|
-| Microcontrolador | ESP32 DevKit V4 | - | 1 |
-| Display OLED | SSD1306 (128x64) | GPIO 21/22 (I2C) | 1 |
-| Sensor de Temperatura/Umidade | DHT22 | GPIO 4 (Data) | 1 |
-| Sensor de Luz | LDR + ADC | GPIO 34 | 1 |
-| Sensor de Gás | MQ-2/MQ-9 | GPIO 39 | 1 |
-| Sensor de Movimento | PIR | GPIO 13 | 1 |
-| Sensor de Distância | HC-SR04 | GPIO 5 (Trig), GPIO 18 (Echo) | 1 |
-| Teclado Matricial | 4x4 | GPIO 2,15,19,33 (linhas), GPIO 26,27,14,16 (colunas) | 1 |
-| LED RGB | Comum | GPIO 12 (R), GPIO 16 (G), GPIO 17 (B) | 1 |
-| NeoPixel Ring | WS2812B 16-pixel | GPIO 17 (Data) | 1 |
-| Buzzer | Passivo 1500Hz | GPIO 25 | 1 |
-| Servo Motor | SG90/MG90 | GPIO 23 (PWM 50Hz) | 1 |
-| Relé | 5V | GPIO 32 | 1 |
-| Potenciômetro | Linear 10k | GPIO 35 | 1 |
+> ⚠️ **A ordem importa.** O firmware serve uma página web (`page.html`), mas essa página precisa existir no sistema de arquivos do ESP32 **antes** do servidor começar a respondê-la. Por isso são **dois passos**.
 
-## 📡 Protocolos de Comunicação
+O código pronto para colar está em **[`para_rodar.md`](para_rodar.md)** — ele contém os dois trechos na ordem certa.
 
-### WiFi
-- Modo STA (Station)
-- Rede: `Wokwi-GUEST` (configurável em `main.py`)
-- Reconexão automática a cada 5 segundos
+### Passo 1 — Gerar a página web
 
-### HTTP
-- **Porta**: 80
-- **Endpoints**:
-  - `GET /` - Retorna página HTML do dashboard
-  - `GET /api/data` - JSON com estado completo do sistema
-  - `GET /t/{campo}` - Toggle de variáveis booleanas (alerta, rele, buz_temp)
-  - `GET /porta/{valor}` - Define ângulo da porta (0-180)
+Abra o simulador em MicroPython no [Wokwi](https://wokwi.com/), carregue o [`diagram.json`](diagram.json) e cole **o primeiro trecho** do [`para_rodar.md`](para_rodar.md) (o bloco `# html`). Esse trecho monta o HTML inteiro numa string e grava em `page.html`.
 
-### MQTT
-- **Broker**: broker.hivemq.com:1883
-- **Tópicos subscritos**:
-  - `casa/henrique/alerta` - Ligação/desligação de alerta
-  - `casa/henrique/rele` - Ligação/desligação do AC
-  - `casa/henrique/buz_temp` - Controle do buzzer
-  - `casa/henrique/porta` - Ângulo da porta
-- **Publicação**: `casa/henrique/status` (a cada 5 segundos)
-
-## 📊 Estrutura de Dados do Estado
-
-```python
-{
-  "alerta": bool,           # Alerta geral ativo
-  "rele": bool,             # Ar-condicionado ligado
-  "porta": int (0-180),     # Ângulo do servo
-  "porta_aberta": bool,     # Status da porta
-  "buz_temp": bool,         # Buzzer por temperatura
-  "temp": float,            # Temperatura em °C
-  "hum": float,             # Umidade em %
-  "luz": int,               # Luminosidade (0-4095)
-  "pot": int,               # Valor do potenciômetro
-  "gas": int,               # Leitura do sensor de gás
-  "limite": float,          # Limite de temperatura atual
-  "mov": int,               # Movimento detectado (0 ou 1)
-  "dist": float,            # Distância em cm
-  "wifi": bool,             # WiFi conectado
-  "mqtt": bool,             # MQTT conectado
-  "oled": bool,             # Display inicializado
-  "kp_buf": str,            # Buffer de entrada do teclado
-  "kp_msg": str,            # Mensagem de feedback do teclado
-  "sistema_armado": bool,   # Sistema em modo armado
-  "alarmes": [{...}]        # Array de alertas ativos
-}
-```
-
-## 🔐 Segurança
-
-- Limite de 3 tentativas de entrada antes de bloqueio
-- Bloqueio de 30 segundos após limite de tentativas
-- CORS habilitado para integração com dashboards
-- Nenhuma sensibilidade a erros de decode (ignorados silenciosamente)
-- Validação de entrada para valores numéricos
-
-## 📦 Instalação e Execução
-
-### Pré-requisitos
-- MicroPython para ESP32
-- Bibliotecas: `dht`, `umqtt.simple`, `neopixel`
-- Simulador Wokwi (opcional, para teste sem hardware)
-
-### Setup
-1. Flash MicroPython no ESP32
-2. Copie `main.py` para o dispositivo
-3. Configure WiFi em `main.py` (linha 49)
-4. Configure MQTT broker se necessário (linha 244)
-5. Reinicie o ESP32
-
-### Arquivos Necessários
-- `main.py` - Firmware principal
-- `page.html` - Dashboard web (gerado automaticamente)
-- `boot.py` - Script de inicialização (opcional)
-
-## 🌐 Acesso ao Dashboard
-
-1. Obtenha o IP do ESP32 via console
-2. Acesse `http://<ESP32_IP>` em qualquer navegador
-3. Dashboard atualiza em tempo real (1Hz)
-4. Controle direto de estados via botões de toggle
-
-## 🧪 Teste e Simulação
-
-Projeto compatível com **Wokwi** (simulador online):
-- Arquivo de configuração: `wokwi.toml`
-- Arquivo de diagrama: `diagram.json`
-- Simula hardware completo sem necessidade de placa física
-
-## 📝 Notas de Implementação
-
-### Performance
-- Loop principal: 10ms (100Hz)
-- Atualização de sensores: 1500ms
-- Atualização MQTT: 5000ms
-- Timeout de conexão HTTP: 300ms
-
-### Gerenciamento de Memória
-- Garbage collection automático ativado
-- Buffer OLED otimizado (1024 bytes)
-- Stream chunked para envio de página.html
-
-### Tratamento de Erros
-- Tentativas de reconexão WiFi a cada 5 segundos
-- Fallback para modo offline com funcionalidade local
-- Logs detalhados via UART para debugging
-
-## 🔄 Fluxo de Operação
+Rode e **espere aparecer no console**:
 
 ```
-Inicialização
-├── WiFi Connect
-├── MQTT Connect (se WiFi OK)
-├── I2C Scan (OLED)
-├── Inicializa Sensores
-└── HTTP Server (porta 80)
-    │
-    ├── Main Loop (10ms)
-    │   ├── Keypad Scan
-    │   ├── HTTP Accept & Process
-    │   ├── Sensor Read (1.5s)
-    │   ├── Smart Logic (Thermostat, Alerts)
-    │   ├── Output Update (PWM, LED, Display)
-    │   └── MQTT Publish (5s)
-    │
-    └── Shutdown Graceful
+HTML Atualizado com Sucesso!
 ```
 
-## 🛠️ Manutenção
+Pronto — a página está salva no ESP32.
 
-### Logs via UART
+### Passo 2 — Subir o firmware
+
+Agora cole e rode **o segundo trecho** do [`para_rodar.md`](para_rodar.md) (o bloco `# Python`). Ele inicializa tudo e entra no loop principal. **Espere conectar** — você vai ver algo assim no console:
+
 ```
 [WIFI]: Iniciando conexao...
-WiFi: IP_Address
-I2C: [hex_addresses]
-OLED: OK
+WiFi: ('10.13.37.2', ...)
+I2C: ['0x3c']
 [MQTT]: Conectando...
 [MQTT]: Conectado!
 ```
 
-### Debugging
-- Descomente prints adicionais em `main.py`
-- Monitore MQTT topics com cliente externo
-- Use simulador Wokwi para análise de pinos
+A partir daí o sistema está vivo: o OLED mostra os dados, os sensores são lidos a cada 1,5 s, e o servidor web está no ar.
 
-## 📄 Licença
+### Passo 3 — Abrir o dashboard
 
-Este projeto é fornecido como está para fins educacionais e pessoais.
+O [`wokwi.toml`](wokwi.toml) já redireciona a porta 80 do ESP32 para a sua máquina:
+
+```toml
+[[net.forward]]
+from = "localhost:8180"
+to = "target:80"
+```
+
+Abra **http://localhost:8180** no navegador e o painel aparece. 🎉
+
+> 💡 **Por que dois passos e não um arquivo `main.py` só?** Gerar o HTML é pesado pra memória do ESP32. Separar a geração (que roda uma vez) da execução (que roda sempre) mantém o firmware principal mais leve e evita estouro de RAM. Depois de gerado uma vez, o `page.html` fica salvo e o Passo 1 não precisa ser repetido.
 
 ---
 
-**Versão**: 1.0  
-**Autor**: Henrique Castro  
+## 🔌 O hardware (circuito)
+
+Tudo isto está montado no [`diagram.json`](diagram.json) — um ESP32 DevKit numa protoboard com os periféricos abaixo. **A pinagem desta tabela é a que de fato roda** (a do `para_rodar.md`):
+
+| Componente | Modelo | Pino(s) ESP32 | Função |
+|---|---|---|---|
+| Microcontrolador | ESP32 DevKit V1 | — | Cérebro de tudo |
+| Display OLED | SSD1306 128×64 | D21 (SDA), D22 (SCL) — I²C | Status local |
+| Temperatura / Umidade | DHT22 | D12 | Leitura ambiental |
+| Luminosidade | LDR (foto-resistor) | D34 (ADC) | Sensor de luz |
+| Gás | Sensor MQ | VN / D39 (ADC) | Detecção de vazamento |
+| Movimento | PIR | D13 | Presença |
+| Distância | HC-SR04 | D5 (Trig), D18 (Echo) | Ultrassônico |
+| Ajuste de limite | Potenciômetro 10 k | D35 (ADC) | Define o limite de temp. |
+| LED RGB | Catodo comum + 3×220 Ω | D14 (R), D26 (G), D27 (B) | Indicador de estado |
+| Relé | Módulo 5 V | D32 | Liga/desliga o ar |
+| Servo | SG90 | D23 (PWM 50 Hz) | Abre/fecha a "porta" |
+| Buzzer | Passivo | D25 (PWM) | Alarme sonoro |
+
+### O que cada cor do LED RGB significa
+
+O LED RGB resume o estado da casa num relance (lógica em `ap()`):
+
+| Cor | Estado |
+|---|---|
+| ⚪ Branco | Tudo normal |
+| 🔵 Azul | Luz da sala ligada |
+| 🟣 Magenta | Luz do quarto ligada |
+| 🩵 Ciano | **Alerta ativo** (acompanha o buzzer) |
+
+---
+
+## 🧠 A lógica por trás
+
+A parte mais interessante do projeto é o **termostato com temperatura virtual**. Em vez de simplesmente comparar a leitura do DHT22 com um limite, o firmware mantém uma temperatura simulada (`v_temp`) que sobe e desce de forma gradual — dá pra "ver" a casa esquentando e o ar resfriando, o que fica ótimo na demonstração.
+
+**Como funciona o ciclo:**
+
+1. **Você define o limite** girando o potenciômetro → `limite = 20 + (pot/4095) × 20`, ou seja, de **20 °C a 40 °C**.
+2. **Casa esquentando** (ar desligado): a temperatura virtual sobe devagar (+0,1 por ciclo) em direção à leitura real, até no máximo `limite + 5`.
+3. **Ponto crítico**: ao bater em `limite + 5`, entra em modo **emergência** — dispara o alerta e o buzzer, e aguarda 1,5 s.
+4. **Ar liga**: passada a espera, o relé liga e a temperatura virtual começa a cair (−0,5 por ciclo).
+5. **Ar desliga**: quando a temperatura chega perto de `limite − 1`, o ar desliga e o ciclo recomeça.
+
+Essa histerese (a folga entre ligar e desligar) evita o relé ficar "batendo" sem parar — exatamente como um ar-condicionado de verdade.
+
+> 🛟 **Segurança contra gás:** se a leitura de gás passar de 3800, o ar-condicionado é **forçado a desligar** na hora.
+
+### Os alarmes
+
+A função `al()` avalia cinco condições a cada ciclo e o dashboard mostra cada uma como ATIVO ou OK:
+
+| Alarme | Dispara quando |
+|---|---|
+| 🌡️ Temperatura Alta | `temp > limite` |
+| 💡 Pouca Luz | `0 < luz < 500` |
+| 🚶 Movimento | PIR detecta presença |
+| 📏 Objeto Próximo | `0 < distância < 30 cm` |
+| ☁️ Gás | `gás > 3800` |
+
+O **alerta geral** (LED ciano + sirene) acende quando há movimento com objeto próximo, vazamento de gás, ou temperatura acima de `limite + 5` com o ar desligado.
+
+---
+
+## 🖥️ As três interfaces
+
+O mesmo estado é exibido em três lugares ao mesmo tempo:
+
+1. **OLED (local)** — mostra temperatura, limite, luz, gás, movimento e distância direto na maquete.
+2. **Dashboard web** — cards animados com todos os sensores, lista de alarmes e botões de controle. Servido pelo próprio ESP32, atualiza 1×/segundo.
+3. **Node-RED / nuvem** — via MQTT (veja abaixo).
+
+---
+
+## 📡 Comunicação: HTTP e MQTT
+
+### Servidor HTTP (porta 80)
+
+O firmware sobe um servidor não-bloqueante que responde:
+
+| Rota | O que faz |
+|---|---|
+| `GET /` | Devolve o dashboard (`page.html`) |
+| `GET /api/data` | JSON com o estado completo + lista de alarmes |
+| `GET /t/<campo>` | Inverte um booleano (`luz_quarto`, `luz_sala`, `rele`, `buz_temp`…) |
+| `GET /porta/<ângulo>` | Posiciona o servo (0–180°) |
+
+### MQTT (broker.hivemq.com:1883)
+
+O ESP32 **publica** o estado em `casa/henrique/status` a cada 5 segundos e **assina** os tópicos de controle:
+
+| Tópico | Ação |
+|---|---|
+| `casa/henrique/alerta` | Liga/desliga o alerta |
+| `casa/henrique/rele` | Liga/desliga o ar-condicionado |
+| `casa/henrique/buz_temp` | Controla o buzzer |
+| `casa/henrique/porta` | Define o ângulo da porta |
+
+### Node-RED incluso
+
+O [`Node_Red.json`](Node_Red.json) é um fluxo pronto para importar no Node-RED. Ele:
+
+- Assina `casa/henrique/status` e monta um **dashboard** com gauges de temperatura/umidade e textos de luz, distância, gás, movimento e status geral.
+- Tem **botões** que publicam de volta nos tópicos de controle (ar, alerta, buzzer, abrir porta).
+- Registra o histórico numa **planilha do Google Sheets** (via Apps Script), limitado a 1 envio por minuto.
+
+---
+
+## 📂 Os arquivos do projeto
+
+> Existem **três variantes** do firmware no repositório. Vale entender a diferença para não se confundir:
+
+| Arquivo | É o quê | Observação |
+|---|---|---|
+| **[`para_rodar.md`](para_rodar.md)** | ✅ **O código que realmente roda.** Os dois trechos para colar no Wokwi (gerar HTML + firmware). | Bate com o `diagram.json`. **Use este.** |
+| [`diagram.json`](diagram.json) | O circuito do Wokwi | Pinagem oficial do projeto |
+| [`page.html`](page.html) | O dashboard web (gerado pelo Passo 1) | Não edite à mão; é gerado |
+| [`wokwi.toml`](wokwi.toml) | Config do Wokwi + redirecionamento de porta | — |
+| [`Node_Red.json`](Node_Red.json) | Fluxo Node-RED (dashboard + Google Sheets) | Importe no Node-RED |
+| [`firmware.py`](firmware.py) | Versão **estendida** com teclado 4×4 (senha `1234`), anel NeoPixel e sirene | ⚠️ Usa **outra pinagem** (DHT no D4, RGB em 12/16/17) e periféricos que **não estão** no `diagram.json` |
+| [`main.py`](main.py) | Versão **enxuta** e local (sem MQTT, sem teclado, sem NeoPixel) | Importa a classe do OLED do `firmware.py`; DHT no D4 |
+
+### ⚠️ Sobre a inconsistência de pinos
+
+Se você for portar `firmware.py` ou `main.py` para hardware real, **confira a pinagem** — ela difere do `para_rodar.md`/`diagram.json` (principalmente o pino do DHT22 e os do LED RGB). A versão de referência, testada e alinhada ao circuito, é a do **`para_rodar.md`**. As outras são experimentos/variações.
+
+---
+
+## 🧰 Pré-requisitos (hardware real, opcional)
+
+Para rodar fora do simulador você precisa de MicroPython no ESP32 e das libs `dht`, `umqtt.simple` e (se for usar o anel) `neopixel`. No Wokwi tudo isso já vem incluído.
+
+---
+
+## 📄 Licença
+
+Projeto educacional/pessoal, fornecido "como está".
+
+---
+
+<div align="center">
+
+**Feito por Henrique Castro** · ESP32 + MicroPython + MQTT + Node-RED
+
+</div>

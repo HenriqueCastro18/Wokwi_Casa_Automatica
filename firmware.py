@@ -102,6 +102,12 @@ def beep_curto(dur=100):
  time.sleep_ms(dur)
  bt.duty(0)
 
+def sirene(ativo):
+ if ativo:
+  bt.freq(1500);bt.duty(512)
+ else:
+  bt.duty(0)
+
 def dh():
  try:
   import dht;d=dht.DHT22(dp);d.measure();return d.temperature(),d.humidity()
@@ -198,12 +204,16 @@ def update_ring():
 def ap():
  re.value(st['rele'])
  sv.duty(int(26+(st['porta']/180)*102))
- bt.duty(512 if st['buz_temp'] else 0)
- if st['alerta']:rr.duty(1023);rg.duty(0);rb.duty(0)
- elif st['mov']:rr.duty(0);rg.duty(0);rb.duty(1023)
- elif st['rele']:rr.duty(1023);rg.duty(600);rb.duty(0)
- elif st['porta_aberta']:rr.duty(0);rg.duty(800);rb.duty(800)
- else:rr.duty(0);rg.duty(1023);rb.duty(0)
+
+ if st['alerta']:
+  rr.duty(0);rg.duty(1023);rb.duty(1023)
+  sirene(True)
+ elif st['temp']>(st['limite']+2.0) or st['gas']>3500 or (0<st['luz']<500) or (st['mov']==1 and st['sistema_armado']):
+  rr.duty(0);rg.duty(0);rb.duty(1023)
+  sirene(False)
+ else:
+  rr.duty(1023);rg.duty(0);rb.duty(1023)
+  sirene(False)
 
 def uo():
  if not OK:return
@@ -332,7 +342,6 @@ while True:
     else:
      em_espera=True;t_alarme=time.ticks_ms();st['alerta']=True
   st['temp']=v_temp
-  st['buz_temp']=em_espera
   if not em_espera:
    st['alerta']=(st['mov']==1 and 0<st['dist']<30 and st['sistema_armado']) or (st['gas']>3800) or (st['temp']>(st['limite']+5.0) and not st['rele'])
   ap();uo();print('T:',round(st['temp'],1),'G:',st['gas'],'K:',st['kp_buf'],'ARM:',st['sistema_armado'],'S:','EMERG' if em_espera else ('AR' if st['rele'] else 'OK'))

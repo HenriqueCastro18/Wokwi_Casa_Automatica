@@ -1,0 +1,473 @@
+[
+    {
+        "id": "5db1491ffe2b59a5",
+        "type": "tab",
+        "label": "Casa Automática",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "5433b5544557055c",
+        "type": "mqtt in",
+        "z": "5db1491ffe2b59a5",
+        "name": "Status ESP32",
+        "topic": "casa/henrique/status",
+        "qos": "0",
+        "datatype": "json",
+        "broker": "broker1",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 100,
+        "y": 180,
+        "wires": [
+            [
+                "aa06a69e0a70ebec",
+                "19cfafa692d3c84e",
+                "14d9626072f37c4d",
+                "f8bb092d6f65bc0c",
+                "079170f62a6d6fe3",
+                "289d1e0872847002",
+                "f1f0c81731a8a6a5",
+                "e4deb126c643d5ec",
+                "b76145ec12bc7606"
+            ]
+        ]
+    },
+    {
+        "id": "aa06a69e0a70ebec",
+        "type": "function",
+        "z": "5db1491ffe2b59a5",
+        "name": "Temp -> Numero",
+        "func": "if (msg.payload && msg.payload.temp !== undefined) {\n    msg.payload = Number(msg.payload.temp);\n    return msg;\n}\nreturn null;",
+        "outputs": 1,
+        "x": 310,
+        "y": 60,
+        "wires": [
+            [
+                "b9214cc52eee6c7f"
+            ]
+        ]
+    },
+    {
+        "id": "19cfafa692d3c84e",
+        "type": "function",
+        "z": "5db1491ffe2b59a5",
+        "name": "Umid -> Numero",
+        "func": "if (msg.payload && msg.payload.hum !== undefined) {\n    msg.payload = Number(msg.payload.hum);\n    return msg;\n}\nreturn null;",
+        "outputs": 1,
+        "x": 310,
+        "y": 120,
+        "wires": [
+            [
+                "66531830b332a745"
+            ]
+        ]
+    },
+    {
+        "id": "b9214cc52eee6c7f",
+        "type": "ui_gauge",
+        "z": "5db1491ffe2b59a5",
+        "name": "Temperatura",
+        "group": "e4194dd2b3b67839",
+        "order": 1,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "Temperatura",
+        "label": "Graus",
+        "format": "{{value}}°C",
+        "min": "10",
+        "max": "50",
+        "x": 530,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "66531830b332a745",
+        "type": "ui_gauge",
+        "z": "5db1491ffe2b59a5",
+        "name": "Umidade",
+        "group": "e4194dd2b3b67839",
+        "order": 2,
+        "width": 3,
+        "height": 3,
+        "gtype": "gage",
+        "title": "Umidade",
+        "label": "Percentual",
+        "format": "{{value}}%",
+        "min": "0",
+        "max": "100",
+        "x": 530,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "14d9626072f37c4d",
+        "type": "ui_text",
+        "z": "5db1491ffe2b59a5",
+        "group": "e4194dd2b3b67839",
+        "order": 3,
+        "width": 3,
+        "height": 1,
+        "name": "Luz",
+        "format": "Luz: {{msg.payload.luz}} lx",
+        "layout": "row-spread",
+        "x": 330,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "f8bb092d6f65bc0c",
+        "type": "ui_text",
+        "z": "5db1491ffe2b59a5",
+        "group": "e4194dd2b3b67839",
+        "order": 4,
+        "width": 3,
+        "height": 1,
+        "name": "Distância",
+        "format": "Distância: {{msg.payload.dist}} cm",
+        "layout": "row-spread",
+        "x": 350,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "079170f62a6d6fe3",
+        "type": "ui_text",
+        "z": "5db1491ffe2b59a5",
+        "group": "e4194dd2b3b67839",
+        "order": 5,
+        "width": 3,
+        "height": 1,
+        "name": "Gás",
+        "format": "Gás: {{msg.payload.gas}}",
+        "layout": "row-spread",
+        "x": 330,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "289d1e0872847002",
+        "type": "ui_text",
+        "z": "5db1491ffe2b59a5",
+        "group": "e4194dd2b3b67839",
+        "order": 6,
+        "width": 3,
+        "height": 1,
+        "name": "Movimento",
+        "format": "Movimento: {{msg.payload.mov === 1 ? 'SIM' : 'NÃO'}}",
+        "layout": "row-spread",
+        "x": 350,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "f1f0c81731a8a6a5",
+        "type": "ui_text",
+        "z": "5db1491ffe2b59a5",
+        "group": "b2603376632f1491",
+        "order": 1,
+        "width": 6,
+        "height": 3,
+        "name": "Status",
+        "format": "<b>WiFi:</b> {{msg.payload.wifi ? 'CONECTADO' : 'DESCONECTADO'}}<br><b>MQTT:</b> {{msg.payload.mqtt ? 'CONECTADO' : 'DESCONECTADO'}}<br><b>OLED:</b> {{msg.payload.oled ? 'OK' : 'ERRO'}}<br><b>Porta:</b> {{msg.payload.porta_aberta ? 'ABERTA' : 'FECHADA'}}<br><b>Alerta:</b> {{msg.payload.alerta ? 'ATIVO' : 'OK'}}<br><b>Buzzer:</b> {{msg.payload.buz_temp ? 'ATIVO' : 'OK'}}<br><b>Ar:</b> {{msg.payload.rele ? 'ON' : 'OFF'}}",
+        "layout": "row-spread",
+        "x": 530,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "b76145ec12bc7606",
+        "type": "delay",
+        "z": "5db1491ffe2b59a5",
+        "name": "Limite: 1 por min",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "minute",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "outputs": 1,
+        "x": 330,
+        "y": 380,
+        "wires": [
+            [
+                "eff432183b64ab89"
+            ]
+        ]
+    },
+    {
+        "id": "eff432183b64ab89",
+        "type": "http request",
+        "z": "5db1491ffe2b59a5",
+        "name": "Enviar p/ Google Sheets",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://script.google.com/macros/s/AKfycbyE6c0jyLH35NgyGc6OEWoDyhO_3eh_UlECXxVjzuCnU6sO2IiT3LVp2R2mV4_x_JSv/exec",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": {
+            "content-type": "application/json"
+        },
+        "x": 570,
+        "y": 380,
+        "wires": [
+            [
+                "be4d18811e33a8a6"
+            ]
+        ]
+    },
+    {
+        "id": "be4d18811e33a8a6",
+        "type": "debug",
+        "z": "5db1491ffe2b59a5",
+        "name": "Retorno Sheets",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 780,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "96e0146bbf4e3e6d",
+        "type": "ui_button",
+        "z": "5db1491ffe2b59a5",
+        "name": "",
+        "group": "f3bce971b7fa5218",
+        "order": 1,
+        "width": 3,
+        "height": 1,
+        "passthru": true,
+        "label": "Ar Condicionado",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "fa-wind",
+        "payload": "1",
+        "payloadType": "num",
+        "x": 160,
+        "y": 480,
+        "wires": [
+            [
+                "ca08b8c9031fe986"
+            ]
+        ]
+    },
+    {
+        "id": "6c6ff4f6699b5b41",
+        "type": "ui_button",
+        "z": "5db1491ffe2b59a5",
+        "name": "",
+        "group": "f3bce971b7fa5218",
+        "order": 2,
+        "width": 3,
+        "height": 1,
+        "passthru": true,
+        "label": "Ativar Alerta",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "fa-bell",
+        "payload": "1",
+        "payloadType": "num",
+        "x": 150,
+        "y": 530,
+        "wires": [
+            [
+                "4d45dd445eca26d7"
+            ]
+        ]
+    },
+    {
+        "id": "d4b93a1b714b4cb1",
+        "type": "ui_button",
+        "z": "5db1491ffe2b59a5",
+        "name": "",
+        "group": "f3bce971b7fa5218",
+        "order": 3,
+        "width": 3,
+        "height": 1,
+        "passthru": true,
+        "label": "Buzzer Geral",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "fa-volume-up",
+        "payload": "1",
+        "payloadType": "num",
+        "x": 150,
+        "y": 580,
+        "wires": [
+            [
+                "cd399c65d4ac7f15"
+            ]
+        ]
+    },
+    {
+        "id": "0f86ba61e7d5d1e7",
+        "type": "ui_button",
+        "z": "5db1491ffe2b59a5",
+        "name": "",
+        "group": "f3bce971b7fa5218",
+        "order": 4,
+        "width": 3,
+        "height": 1,
+        "passthru": true,
+        "label": "Abrir Porta",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "fa-unlock",
+        "payload": "90",
+        "payloadType": "num",
+        "x": 140,
+        "y": 630,
+        "wires": [
+            [
+                "4420a8881005fa02"
+            ]
+        ]
+    },
+    {
+        "id": "ca08b8c9031fe986",
+        "type": "mqtt out",
+        "z": "5db1491ffe2b59a5",
+        "name": "",
+        "topic": "casa/henrique/rele",
+        "qos": "0",
+        "retain": false,
+        "broker": "broker1",
+        "x": 410,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "4d45dd445eca26d7",
+        "type": "mqtt out",
+        "z": "5db1491ffe2b59a5",
+        "name": "",
+        "topic": "casa/henrique/alerta",
+        "qos": "0",
+        "retain": false,
+        "broker": "broker1",
+        "x": 410,
+        "y": 530,
+        "wires": []
+    },
+    {
+        "id": "cd399c65d4ac7f15",
+        "type": "mqtt out",
+        "z": "5db1491ffe2b59a5",
+        "name": "",
+        "topic": "casa/henrique/buz_temp",
+        "qos": "0",
+        "retain": false,
+        "broker": "broker1",
+        "x": 410,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "4420a8881005fa02",
+        "type": "mqtt out",
+        "z": "5db1491ffe2b59a5",
+        "name": "",
+        "topic": "casa/henrique/porta",
+        "qos": "0",
+        "retain": false,
+        "broker": "broker1",
+        "x": 410,
+        "y": 630,
+        "wires": []
+    },
+    {
+        "id": "e4deb126c643d5ec",
+        "type": "debug",
+        "z": "5db1491ffe2b59a5",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "x": 330,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "broker1",
+        "type": "mqtt-broker",
+        "name": "HiveMQ",
+        "broker": "broker.hivemq.com",
+        "port": "1883",
+        "tls": false,
+        "clientid": "nodered_casa",
+        "usetls": false,
+        "compatmode": false,
+        "keepalive": "60",
+        "cleansession": true
+    },
+    {
+        "id": "e4194dd2b3b67839",
+        "type": "ui_group",
+        "z": "5db1491ffe2b59a5",
+        "name": "Sensores",
+        "tab": "tab_ui",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "b2603376632f1491",
+        "type": "ui_group",
+        "z": "5db1491ffe2b59a5",
+        "name": "Status Geral",
+        "tab": "tab_ui",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "f3bce971b7fa5218",
+        "type": "ui_group",
+        "z": "5db1491ffe2b59a5",
+        "name": "Controles",
+        "tab": "tab_ui",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "tab_ui",
+        "type": "ui_tab",
+        "name": "Dashboard",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "5a7fec608b9fb4fa",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-dashboard": "3.6.6"
+        }
+    }
+]

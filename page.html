@@ -1,378 +1,83 @@
 <!DOCTYPE html>
 <html lang=pt-BR>
-
 <head>
-    <meta charset=utf-8>
-    <meta name=viewport content="width=device-width,initial-scale=1">
-    <title>Casa IoT</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
-        }
-
-        body {
-            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-            color: #fff;
-            min-height: 100vh;
-            padding: 20px
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 24px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.1)
-        }
-
-        h1 {
-            font-size: 32px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #00d9ff, #ff00aa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 8px
-        }
-
-        .subtitle {
-            color: #a0a0c0;
-            font-size: 14px
-        }
-
-        .status-bar {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-top: 15px;
-            flex-wrap: wrap
-        }
-
-        .pill {
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 6px
-        }
-
-        .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            animation: p 2s infinite
-        }
-
-        @keyframes p {
-
-            0%,
-            100% {
-                opacity: 1
-            }
-
-            50% {
-                opacity: .5
-            }
-        }
-
-        .ok .dot {
-            background: #00ff88;
-            box-shadow: 0 0 10px #00ff88
-        }
-
-        .ok {
-            background: rgba(0, 255, 136, 0.1);
-            color: #00ff88;
-            border: 1px solid rgba(0, 255, 136, 0.3)
-        }
-
-        .er .dot {
-            background: #ff4466
-        }
-
-        .er {
-            background: rgba(255, 68, 102, 0.1);
-            color: #ff4466;
-            border: 1px solid rgba(255, 68, 102, 0.3)
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 30px
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: transform .2s
-        }
-
-        .card:hover {
-            transform: translateY(-4px)
-        }
-
-        .card h2 {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #a0a0c0;
-            margin-bottom: 12px;
-            font-weight: 600
-        }
-
-        .val {
-            font-size: 32px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #00d9ff, #7b61ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent
-        }
-
-        .un {
-            font-size: 13px;
-            color: #a0a0c0;
-            margin-left: 4px
-        }
-
-        .tag {
-            font-size: 11px;
-            padding: 3px 8px;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.08);
-            color: #a0a0c0;
-            display: inline-block;
-            margin-bottom: 8px
-        }
-
-        .act {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px
-        }
-
-        .ac {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.1)
-        }
-
-        .ah {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px
-        }
-
-        .an {
-            font-weight: 600;
-            font-size: 13px
-        }
-
-        .as {
-            font-size: 10px;
-            padding: 3px 8px;
-            border-radius: 10px;
-            font-weight: 700
-        }
-
-        .on {
-            background: rgba(0, 255, 136, 0.2);
-            color: #00ff88;
-            border: 1px solid #00ff88
-        }
-
-        .of {
-            background: rgba(255, 255, 255, 0.05);
-            color: #888;
-            border: 1px solid #444
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #00d9ff, #7b61ff);
-            color: #fff;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 12px;
-            width: 100%;
-            transition: transform .2s
-        }
-
-        .btn:hover {
-            transform: scale(1.03)
-        }
-
-        .btnsm {
-            padding: 6px 10px;
-            font-size: 11px;
-            width: auto
-        }
-
-        .st {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 16px
-        }
-
-        .al {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 12px
-        }
-
-        .alc {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 16px;
-            border: 2px solid transparent;
-            transition: all .3s
-        }
-
-        .alA {
-            background: rgba(255, 68, 102, 0.15);
-            border-color: #ff4466;
-            animation: alr 1s infinite
-        }
-
-        .alI {
-            background: rgba(0, 255, 136, 0.05);
-            border-color: rgba(0, 255, 136, 0.2)
-        }
-
-        @keyframes alr {
-
-            0%,
-            100% {
-                box-shadow: 0 0 0 0 rgba(255, 68, 102, 0.5)
-            }
-
-            50% {
-                box-shadow: 0 0 0 6px rgba(255, 68, 102, 0)
-            }
-        }
-
-        .alt {
-            font-weight: 700;
-            font-size: 13px;
-            margin-bottom: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center
-        }
-
-        .alc-b {
-            font-size: 9px;
-            padding: 2px 6px;
-            border-radius: 8px;
-            font-weight: 700
-        }
-
-        .alA .alc-b {
-            background: #ff4466
-        }
-
-        .alI .alc-b {
-            background: #00ff88;
-            color: #000
-        }
-
-        .alcd {
-            font-size: 11px;
-            color: #a0a0c0;
-            line-height: 1.5
-        }
-
-        .pc {
-            display: flex;
-            gap: 6px;
-            margin-top: 8px;
-            justify-content: center
-        }
-
-        footer {
-            text-align: center;
-            color: #666;
-            font-size: 11px;
-            margin-top: 30px;
-            padding: 16px
-        }
-
-        @media(max-width:600px) {
-            h1 {
-                font-size: 22px
-            }
-
-            .val {
-                font-size: 24px
-            }
-        }
-    </style>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>Casa IoT</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}
+body{background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);color:#fff;min-height:100vh;padding:20px}
+.container{max-width:1200px;margin:0 auto}
+header{text-align:center;margin-bottom:30px;padding:24px;background:rgba(255,255,255,0.05);border-radius:16px;border:1px solid rgba(255,255,255,0.1)}
+h1{font-size:32px;font-weight:700;background:linear-gradient(135deg,#00d9ff,#ff00aa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.subtitle{color:#a0a0c0;font-size:14px}
+.status-bar{display:flex;justify-content:center;gap:12px;margin-top:15px;flex-wrap:wrap}
+.pill{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;animation:p 2s infinite}
+@keyframes p{0%,100%{opacity:1}50%{opacity:.5}}
+.ok .dot{background:#00ff88;box-shadow:0 0 10px #00ff88}
+.ok{background:rgba(0,255,136,0.1);color:#00ff88;border:1px solid rgba(0,255,136,0.3)}
+.er .dot{background:#ff4466}
+.er{background:rgba(255,68,102,0.1);color:#ff4466;border:1px solid rgba(255,68,102,0.3)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:30px}
+.card{background:rgba(255,255,255,0.05);border-radius:16px;padding:20px;border:1px solid rgba(255,255,255,0.1);transition:transform .2s}
+.card:hover{transform:translateY(-4px)}
+.card h2{font-size:12px;text-transform:uppercase;letter-spacing:2px;color:#a0a0c0;margin-bottom:12px;font-weight:600}
+.val{font-size:32px;font-weight:700;background:linear-gradient(135deg,#00d9ff,#7b61ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.un{font-size:13px;color:#a0a0c0;margin-left:4px}
+.tag{font-size:11px;padding:3px 8px;border-radius:10px;background:rgba(255,255,255,0.08);color:#a0a0c0;display:inline-block;margin-bottom:8px}
+.act{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.ac{background:rgba(255,255,255,0.05);border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.1)}
+.ah{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.an{font-weight:600;font-size:13px}
+.as{font-size:10px;padding:3px 8px;border-radius:10px;font-weight:700}
+.on{background:rgba(0,255,136,0.2);color:#00ff88;border:1px solid #00ff88}
+.of{background:rgba(255,255,255,0.05);color:#888;border:1px solid #444}
+.btn{background:linear-gradient(135deg,#00d9ff,#7b61ff);color:#fff;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:600;font-size:12px;width:100%;transition:transform .2s}
+.btn:hover{transform:scale(1.03)}
+.st{font-size:18px;font-weight:700;margin-bottom:16px}
+.al{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.alc{background:rgba(0,0,0,0.3);border-radius:12px;padding:16px;border:2px solid transparent;transition:all .3s}
+.alA{background:rgba(255,68,102,0.25);border-color:#ff4466;animation:alr 1s infinite}
+.alI{background:rgba(0,255,136,0.03);border-color:rgba(0,255,136,0.15)}
+@keyframes alr{0%,100%{box-shadow:0 0 0 0 rgba(255,68,102,0.6)}50%{box-shadow:0 0 0 8px rgba(255,68,102,0)}}
+.alt{font-weight:700;font-size:14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.alc-b{font-size:10px;padding:3px 8px;border-radius:8px;font-weight:800}
+.alA .alc-b{background:#ff4466;color:#fff}
+.alI .alc-b{background:rgba(0,255,136,0.1);color:#00ff88}
+.alS .alc-b{background:#00ff88;color:#16213e;box-shadow:0 0 8px #00ff88}
+.alS{background:rgba(0,255,136,0.12);border-color:#00ff88;box-shadow:0 0 12px rgba(0,255,136,0.15)}
+.alcd{font-size:12px;color:#cbd5e1;line-height:1.6;background:rgba(255,255,255,0.03);padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.05)}
+footer{text-align:center;color:#666;font-size:11px;margin-top:30px;padding:16px}
+</style>
 </head>
-
 <body>
-    <div class=container>
-        <header>
-            <h1>Automacao Residencial IoT</h1>
-            <div class=subtitle>Sistema de monitoramento - Henrique</div>
-            <div class=status-bar id=sb></div>
-        </header>
-        <div class=st>Sensores em Tempo Real</div>
-        <div class=grid id=ss></div>
-        <div class=st>Sistema de Alarmes</div>
-        <div class=al id=aa></div>
-        <div class=st>Controle de Atuadores</div>
-        <div class=act id=at></div>
-        <footer>Atualizando a cada 1s | ESP32 + MicroPython + MQTT (broker.hivemq.com)</footer>
-    </div>
-    <script>
-        async function tg(k) { await fetch('/t/' + k); up() }
-        async function po(a) { await fetch('/porta/' + a); up() }
-        async function up() {
-            try {
-                const r = await fetch('/api/data'); const d = await r.json();
-                document.getElementById('sb').innerHTML =
-                    '<div class="pill ' + (d.wifi ? 'ok' : 'er') + '"><span class=dot></span>WiFi</div>' +
-                    '<div class="pill ' + (d.mqtt ? 'ok' : 'er') + '"><span class=dot></span>MQTT</div>' +
-                    '<div class="pill ' + (d.oled ? 'ok' : 'er') + '"><span class=dot></span>OLED</div>';
-                document.getElementById('ss').innerHTML =
-                    '<div class=card><div class=tag>DHT22</div><h2>Temperatura</h2><div class=val>' + d.temp + '<span class=un>C</span></div></div>' +
-                    '<div class=card><div class=tag>DHT22</div><h2>Umidade</h2><div class=val>' + d.hum + '<span class=un>%</span></div></div>' +
-                    '<div class=card><div class=tag>LDR</div><h2>Luminosidade</h2><div class=val>' + d.luz + '</div></div>' +
-                    '<div class=card><div class=tag>Potenciometro</div><h2>Regulagem</h2><div class=val>' + d.pot + '</div></div>' +
-                    '<div class=card><div class=tag>PIR</div><h2>Movimento</h2><div class=val style="font-size:20px">' + (d.mov ? 'DETECTADO' : 'Nenhum') + '</div></div>' +
-                    '<div class=card><div class=tag>HC-SR04</div><h2>Distancia</h2><div class=val>' + Math.round(d.dist) + '<span class=un>cm</span></div></div>';
-                let h = ''; for (const a of d.alarmes) {
-                    h += '<div class="alc ' + (a.ativo ? 'alA' : 'alI') + '"><div class=alt>' + a.nome + '<span class=alc-b>' + (a.ativo ? 'ATIVO' : 'OK') + '</span></div><div class=alcd>' + a.cond + '<br><b>Atual:</b> ' + a.atual + '</div></div>';
-                }
-                document.getElementById('aa').innerHTML = h;
-                let c = ''; const acts = [['sala', 'Luz Sala'], ['quarto', 'Luz Quarto'], ['alerta', 'LED Alerta'], ['rele', 'Ventilador'], ['buz_temp', 'Buz Temp'], ['buz_luz', 'Buz Luz'], ['buz_mov', 'Buz Mov'], ['buz_dist', 'Buz Dist']];
-                for (const [k, n] of acts) {
-                    const o = d[k];
-                    c += '<div class=ac><div class=ah><div class=an>' + n + '</div><span class="as ' + (o ? 'on' : 'of') + '">' + (o ? 'ON' : 'OFF') + '</span></div><button class=btn onclick="tg(\'' + k + '\')">Alternar</button></div>';
-                }
-                c += '<div class=ac><div class=ah><div class=an>Porta (Servo)</div><span class=as style="background:rgba(0,217,255,0.2);color:#00d9ff;border:1px solid #00d9ff">' + d.porta + '&deg;</span></div><div class=pc><button class="btn btnsm" onclick="po(0)">Fechar</button><button class="btn btnsm" onclick="po(90)">Meio</button><button class="btn btnsm" onclick="po(180)">Abrir</button></div></div>';
-                document.getElementById('at').innerHTML = c;
-            } catch (e) { }
-        }
-        up(); setInterval(up, 1000);
-    </script>
+<div class=container>
+<header>
+<h1>Automacao Residencial IoT</h1>
+<div class=subtitle>Sistema de Monitoring - Henrique</div>
+<div class=status-bar id=sb></div>
+</header>
+<div class=st>Sensores em Tempo Real</div>
+<div class=grid id=ss></div>
+<div class=st>Sistema de Alarmes</div>
+<div class=al id=aa></div>
+<div class=st>Controle de Atuadores</div>
+<div class=act id=at></div>
+<footer>Atualizando a cada 1s | ESP32 + MicroPython</footer>
+</div>
+<script>
+async function tg(k){await fetch('/t/'+k);up()}
+async function up(){try{const r=await fetch('/api/data',{cache:'no-store'});const d=await r.json();
+document.getElementById('sb').innerHTML='<div class="pill '+(d.wifi?'ok':'er')+'"><span class=dot></span>WiFi</div>'+'<div class="pill '+(d.mqtt?'ok':'er')+'"><span class=dot></span>MQTT</div>'+'<div class="pill '+(d.oled?'ok':'er')+'"><span class=dot></span>OLED</div>';
+document.getElementById('ss').innerHTML='<div class=card><div class=tag>DHT22</div><h2>Temperatura</h2><div class=val>'+d.temp+'<span class=un>°C</span></div></div>'+'<div class=card><div class=tag>DHT22</div><h2>Umidade</h2><div class=val>'+d.hum+'<span class=un>%</span></div></div>'+'<div class=card><div class=tag>LDR</div><h2>Luz</h2><div class=val>'+d.luz+'</div></div>'+'<div class=card><div class=tag>Potenciometro</div><h2>Limite</h2><div class=val>'+d.limite.toFixed(1)+'<span class=un>°C</span></div></div>'+'<div class=card><div class=tag>PIR</div><h2>Movimento</h2><div class=val>'+(d.mov?'SIM':'NAO')+'</div></div>'+'<div class=card><div class=tag>HC-SR04</div><h2>Distancia</h2><div class=val>'+Math.round(d.dist)+'<span class=un>cm</span></div></div>'+'<div class=card><div class=tag>Gas</div><h2>Gas</h2><div class=val>'+d.gas+'</div></div>';
+let h='';for(const a of d.alarmes){h+='<div class="alc '+(a.ativo?'alA':'alI')+'"><div class=alt>'+a.nome+'<span class=alc-b>'+(a.ativo?'ATIVO':'OK')+'</span></div><div class=alcd><b>Cond:</b> '+a.cond+'<br><b>Atual:</b> '+a.atual+'</div></div>';}
+h+='<div class="alc '+(d.porta_aberta?'alS':'alI')+'"><div class=alt>Sensor de Porta<span class=alc-b>'+(d.porta_aberta?'ABERTA':'OK')+'</span></div><div class=alcd><b>Cond:</b> Aberta<br><b>Atual:</b> '+(d.porta_aberta?'ABERTA':'FECHADA')+'</div></div>';
+document.getElementById('aa').innerHTML=h;
+let c='';const acts=[['luz_quarto','Luz Quarto'],['luz_sala','Luz Sala'],['rele','Ar Condicionado'],['buz_temp','Buzzer Geral']];
+for(const[k,n]of acts){const o=d[k];c+='<div class=ac><div class=ah><div class=an>'+n+'</div><span class="as '+(o?'on':'of')+'">'+(o?'ON':'OFF')+'</span></div><button class=btn onclick="tg(\''+k+'\')">Alternar</button></div>';}
+document.getElementById('at').innerHTML=c;}catch(e){console.error(e)}}
+up();setInterval(up,1000);
+</script>
 </body>
-
 </html>
