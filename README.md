@@ -196,7 +196,6 @@ O [`Node_Red.json`](Node_Red.json) é um fluxo pronto para importar no Node-RED.
 | [`page.html`](page.html) | O dashboard web (gerado pelo Passo 1) | Não edite à mão; é gerado |
 | [`wokwi.toml`](wokwi.toml) | Config do Wokwi + redirecionamento de porta | — |
 | [`Node_Red.json`](Node_Red.json) | Fluxo Node-RED (dashboard + Google Sheets) | Importe no Node-RED |
-| [`firmware.py`](firmware.py) | Versão **estendida** com teclado 4×4 (senha `1234`), anel NeoPixel e sirene | ⚠️ Usa **outra pinagem** (DHT no D4, RGB em 12/16/17) e periféricos que **não estão** no `diagram.json` |
 | [`main.py`](main.py) | Versão **enxuta** e local (sem MQTT, sem teclado, sem NeoPixel) | Importa a classe do OLED do `firmware.py`; DHT no D4 |
 
 ### ⚠️ Sobre a inconsistência de pinos
@@ -209,13 +208,7 @@ Se você for portar `firmware.py` ou `main.py` para hardware real, **confira a p
 
 Para rodar fora do simulador você precisa de MicroPython no ESP32 e das libs `dht`, `umqtt.simple` e (se for usar o anel) `neopixel`. No Wokwi tudo isso já vem incluído.
 
----
 
-## 📄 Licença
-
-Projeto educacional/pessoal, fornecido "como está".
-
----
 
 <div align="center">
 
